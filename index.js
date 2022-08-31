@@ -2,6 +2,7 @@ require('dotenv').config()
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 
 const dbConfig = require('./src/configs/db.config');
 const courseRoutes = require('./src/routes/course.route');
@@ -13,6 +14,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 const dbUri = `mongodb://127.0.0.1:27017/ink`;
 
+app.use(cors());
 app.use(bodyParser.json());
 app.use('/api/courses', courseRoutes);
 app.use('/api/transactions', transactionRoutes);
