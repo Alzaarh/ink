@@ -3,6 +3,7 @@ const { body } = require('express-validator');
 
 const { create } = require('../controllers/transaction.controller');
 const User = require('../models/user.model');
+const validate = require('../middlewares/validate.middleware');
 
 router.post(
     '/',
@@ -20,6 +21,7 @@ router.post(
         body('name').notEmpty(),
         body('phone').notEmpty()
     ],
+    validate,
     create
 );
 

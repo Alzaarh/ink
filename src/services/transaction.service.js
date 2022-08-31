@@ -1,7 +1,7 @@
 const ZarinpalCheckout = require('zarinpal-checkout');
 
 const Transaction = require('../models/transaction.model');
-const Course = require('../models/course.model');
+const price = require('../configs/price.config');
 
 const merchantID = process.env.MERCHANT_ID
 const isSandbox = process.env.SANDBOX ? true : false;
@@ -9,9 +9,8 @@ const callbackURL = process.env.CALLBACK_URL;
 const zarinpal = ZarinpalCheckout.create(merchantID, isSandbox);
 
 exports.create = async (data) => {
-    const course = (await Course.find({}))[0];
     const res = await zarinpal.PaymentRequest({
-        Amount: course.price, // In Tomans
+        Amount: price, // In Tomans
         CallbackURL: callbackURL,
         Description: 'A Payment from Node.JS'
     });
