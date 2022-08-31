@@ -9,6 +9,7 @@ const courseRoutes = require('./src/routes/course.route');
 const transactionRoutes = require('./src/routes/transaction.route');
 const subscriberRoutes = require('./src/routes/subscriber.route');
 const visitorRoutes = require('./src/routes/visitor.route');
+const contactRoutes = require('./src/routes/contact.route');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -20,6 +21,7 @@ app.use('/api/courses', courseRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/subscribers', subscriberRoutes);
 app.use('/api/visitors', visitorRoutes);
+app.use('/api/contacts', contactRoutes);
 
 mongoose.connect(dbUri)
     .then(() => {
