@@ -16,7 +16,7 @@ exports.create = async (data) => {
     });
     if (res.status === 100) {
         await Transaction.create({
-            amount: course.price,
+            amount: price,
             id: res.authority,
             belongsTo: data
         });
@@ -24,6 +24,19 @@ exports.create = async (data) => {
     }
 };
 
-exports.verifyTransaction = async (data) => {
-    
+exports.verify = async (id, { amount }) => {
+    const response = await zarinpal.PaymentVerification({
+        Amount: amount, // In Tomans
+        Authority: id
+    });
+    const transaction = await Transaction.findOne({ id });
+    if (response.status !== 100) {
+        await transaction.fail();
+        return false;
+    } else {
+        await transaction.success();
+        transaction.refID = response.RefID; 
+        await transaction.save();
+        return true;
+    }
 };

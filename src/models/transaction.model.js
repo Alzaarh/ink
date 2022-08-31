@@ -35,8 +35,17 @@ const transactionSchema = new mongoose.Schema({
         required: true,
         default: 1
     },
+    refID: String,
     belongsTo: personSchema
 });
+
+transactionSchema.methods.success = function(cb) {
+    return mongoose.model('Transaction').findByIdAndUpdate(this._id, { status: 2 }, cb);
+};
+
+transactionSchema.methods.fail = function(cb) {
+    return mongoose.model('Transaction').findByIdAndUpdate(this._id, { status: 3 }, cb);
+};
 
 const Transaction = mongoose.model('Transaction', transactionSchema);
 

@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const { body } = require('express-validator');
 
-const { create } = require('../controllers/transaction.controller');
+const { create, verify } = require('../controllers/transaction.controller');
 const User = require('../models/user.model');
 const validate = require('../middlewares/validate.middleware');
 
@@ -24,5 +24,7 @@ router.post(
     validate,
     create
 );
+
+router.put('/:id', verify);
 
 module.exports = router;
