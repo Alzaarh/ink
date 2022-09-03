@@ -19,8 +19,9 @@ exports.create = async (req, res) => {
 };
 
 exports.verify = async (req, res) => {
-    if (await verify(req.params.id, { amount: req.body.amount })) {
-        return res.json({ data: { success: true } });
+    const result = await verify(req.params.id);
+    if (result) {
+        return res.json({ data: { success: true, ...result } });
     }
     return res.json({ data: { success: false } });
 };

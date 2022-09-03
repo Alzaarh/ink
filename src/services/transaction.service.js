@@ -1,6 +1,8 @@
 const ZarinpalCheckout = require('zarinpal-checkout');
+const generator = require('generate-password');
 
 const Transaction = require('../models/transaction.model');
+const User = require('../models/user.model');
 const price = require('../configs/price.config');
 
 const merchantID = process.env.MERCHANT_ID
@@ -24,9 +26,9 @@ exports.create = async (data) => {
     }
 };
 
-exports.verify = async (id, { amount }) => {
+exports.verify = async (id) => {
     const response = await zarinpal.PaymentVerification({
-        Amount: amount, // In Tomans
+        Amount: price, // In Tomans
         Authority: id
     });
     const transaction = await Transaction.findOne({ id });
@@ -37,6 +39,12 @@ exports.verify = async (id, { amount }) => {
         await transaction.success();
         transaction.refID = response.RefID; 
         await transaction.save();
-        return true;
+        const newUser = await User.create({
+            email: transaction.belongsTo.email,
+            name: transaction.belongsTo.name,
+            phone: transaction.belongsTophonel,
+            password: generator.generate({ length: 10, numbers: true })
+        });
+        return { user: newUser };
     }
 };

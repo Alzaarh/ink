@@ -12,6 +12,7 @@
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
     "express-validator": "^6.14.2",
+    "generate-password": "^1.7.0",
     "jalali-date": "^1.1.4",
     "mongoose": "^6.4.6",
     "zarinpal-checkout": "^0.2.7"
