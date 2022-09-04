@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
-const mongooseHidden = require("mongoose-hidden")();
 
 const userSchema = new mongoose.Schema(
   {
@@ -11,12 +10,10 @@ const userSchema = new mongoose.Schema(
     },
     name: String,
     phone: String,
-    password: { type: String, hide: true },
+    password: String,
   },
   { timestamps: true }
 );
-
-userSchema.plugin(mongooseHidden);
 
 userSchema.pre("save", async function () {
   const saltRounds = 10;
