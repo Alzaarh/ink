@@ -1,0 +1,1 @@
+exports.videoDir = ".storage/videos";

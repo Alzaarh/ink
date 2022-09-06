@@ -1,5 +1,7 @@
 const jwt = require("jsonwebtoken");
 
+const User = require("../models/user.model");
+
 const privateKey = process.env.JWT_KEY;
 
 const generateToken = (email) => {
@@ -17,4 +19,14 @@ const generateToken = (email) => {
 
 exports.login = async (email) => {
   return await generateToken(email);
+};
+
+exports.showSelf = (user) => {
+  const self = { ...user._doc };
+  delete self.password;
+  return self;
+};
+
+exports.updateSelf = async (id, data) => {
+  return await User.findByIdAndUpdate(id, data, { returnDocument: "after" });
 };
