@@ -1,13 +1,13 @@
 const fs = require("fs");
 
-const { getAll, create, getOne } = require("../services/video.service");
+const { getAll, create, getOne, stream } = require("../services/video.service");
 
 exports.index = async (_req, res) => {
   return res.json({ data: await getAll() });
 };
 
-exports.show = async (req, res) => {
-  const info = await getOne(
+exports.stream = async (req, res) => {
+  const info = await stream(
     req.params.categoryID,
     req.params.id,
     req.get("range")
@@ -28,6 +28,14 @@ exports.show = async (req, res) => {
     end: info.end,
   });
   videoStream.pipe(res);
+};
+
+exports.show = async (req, res) => {
+  const video = await getOne(req.params.categoryID, req.params.id);
+  if (!video) {
+    return res.status(404).json({});
+  }
+  res.json({ data: video });
 };
 
 exports.create = async (req, res) => {

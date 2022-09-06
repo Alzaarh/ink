@@ -11,7 +11,7 @@ exports.getAll = async () => {
   });
 };
 
-exports.getOne = async (categoryID, videoID, range) => {
+exports.stream = async (categoryID, videoID, range) => {
   const category = await VideoCategory.findById(categoryID);
   if (category) {
     const video = category.videos.find(
@@ -23,6 +23,35 @@ exports.getOne = async (categoryID, videoID, range) => {
       const start = Number(range.replace(/\D/g, ""));
       const end = Math.min(start + CHUNK_SIZE, videoSize - 1);
       return { videoSize, start, end, videoPath: `${videoDir}/${video.path}` };
+    }
+  }
+};
+
+exports.getOne = async (categoryID, videoID) => {
+  const category = await VideoCategory.findById(categoryID);
+  if (category) {
+    const video = category.videos.find(
+      (video) => video._id.toString() === videoID
+    );
+    if (video) {
+      const data = { ...video._doc };
+      let nextVideo = category.videos.find(
+        (nextVideo) => nextVideo.order === video.order + 1
+      );
+      if (nextVideo) {
+        data.nextID = `${category._id}/${nextVideo._id}`;
+      } else {
+        const nextCategory = await VideoCategory.findOne({
+          order: category.order + 1,
+        });
+        if (nextCategory) {
+          nextVideo = nextCategory.videos.find((video) => video.order === 1);
+          if (nextVideo) {
+            data.nextID = `${nextCategory._id}/${nextVideo._id}`;
+          }
+        }
+      }
+      return data;
     }
   }
 };
