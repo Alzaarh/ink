@@ -27,6 +27,10 @@ exports.showSelf = (user) => {
   return self;
 };
 
-exports.updateSelf = async (id, data) => {
-  return await User.findByIdAndUpdate(id, data, { returnDocument: "after" });
+exports.updateSelf = async (id, { name, phone, age, city, province }) => {
+  return await User.findByIdAndUpdate(
+    id,
+    { name, phone, age, city, province },
+    { returnDocument: "after" }
+  );
 };

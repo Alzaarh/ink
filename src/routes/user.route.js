@@ -38,18 +38,7 @@ router.post(
 
 router.get("/self", auth, showSelf);
 
-router.put(
-  "/self",
-  auth,
-  [
-    body("name").isString(),
-    body("phone").isString(),
-    body("province").isString(),
-    body("city").isString(),
-    body("age").isNumeric(),
-  ],
-  updateSelf
-);
+router.patch("/self", auth, updateSelf);
 
 router.patch(
   "/self/password",
