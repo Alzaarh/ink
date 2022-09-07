@@ -13,3 +13,9 @@ exports.showSelf = (req, res) => {
 exports.updateSelf = async (req, res) => {
   return res.json({ data: await updateSelf(req.user._id, req.body) });
 };
+
+exports.updatePassword = async (req, res) => {
+  req.user.password = req.body.newPassword;
+  await req.user.save();
+  return res.json({});
+};

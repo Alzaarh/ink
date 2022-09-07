@@ -6,6 +6,7 @@ const {
   login,
   showSelf,
   updateSelf,
+  updatePassword,
 } = require("../controllers/user.controller");
 const User = require("../models/user.model");
 const validate = require("../middlewares/validate.middleware");
@@ -48,6 +49,25 @@ router.put(
     body("age").isNumeric(),
   ],
   updateSelf
+);
+
+router.patch(
+  "/self/password",
+  auth,
+  [
+    body("oldPassword")
+      .notEmpty()
+      .custom((value, { req }) => {
+        return bcrypt.compare(value, req.user.password).then((result) => {
+          if (!result) {
+            return Promise.reject("رمزعبور اشتباه است");
+          }
+        });
+      }),
+    body("newPassword").notEmpty(),
+  ],
+  validate,
+  updatePassword
 );
 
 module.exports = router;
