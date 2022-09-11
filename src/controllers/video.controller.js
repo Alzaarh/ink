@@ -3,7 +3,7 @@ const fs = require("fs");
 const { getAll, create, getOne, stream } = require("../services/video.service");
 
 exports.index = async (_req, res) => {
-  return res.json({ data: await getAll() });
+  res.json({ data: await getAll() });
 };
 
 exports.stream = async (req, res) => {

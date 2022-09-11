@@ -3,8 +3,6 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-
-const dbConfig = require("./src/configs/db.config");
 const courseRoutes = require("./src/routes/course.route");
 const transactionRoutes = require("./src/routes/transaction.route");
 const subscriberRoutes = require("./src/routes/subscriber.route");
@@ -14,6 +12,7 @@ const userRoutes = require("./src/routes/user.route");
 const videoRoutes = require("./src/routes/video.route");
 const feedbackRoutes = require("./src/routes/feedback.route");
 const homeworkRoutes = require("./src/routes/homework.route");
+const printableRoutes = require("./src/routes/printable.route");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -30,6 +29,13 @@ app.use("/api/users", userRoutes);
 app.use("/api/videos", videoRoutes);
 app.use("/api/feedbacks", feedbackRoutes);
 app.use("/api/homeworks", homeworkRoutes);
+app.use("/api/printables", printableRoutes);
+
+// default error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: { message: "Server error" } });
+});
 
 mongoose
   .connect(dbUri)

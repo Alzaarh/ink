@@ -1,13 +1,27 @@
 const fs = require("fs");
-const mongoose = require("mongoose");
 
-const VideoCategory = require("../models/video.model");
+// third party modules
+const encryptor = require("simple-encryptor")(
+  require("../configs/auth.config").encryptionKey
+);
+
+const VideoCategory = require("../models/videoCategory.model");
 const { videoDir } = require("../configs/storage.config");
 
 exports.getAll = async () => {
-  return await VideoCategory.find({}).sort({
-    order: "asc",
-    "videos.order": "asc",
+  // fetch all video categories sorted by order
+  const videoCategories = await VideoCategory.find({})
+    .sort({
+      order: "asc",
+      "videos.order": "asc",
+    })
+    .lean();
+  // encrypt current timestamp and add it to videos
+  return videoCategories.map((videoCategory) => {
+    return videoCategory.videos.map((video) => {
+      video.code = encryptor.encrypt(Date.now());
+      return videoCategory;
+    });
   });
 };
 
