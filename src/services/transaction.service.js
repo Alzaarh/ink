@@ -43,7 +43,7 @@ exports.verify = async (id) => {
     const newUser = await User.create({
       email: transaction.belongsTo.email,
       name: transaction.belongsTo.name,
-      phone: transaction.belongsTophonel,
+      phone: transaction.belongsTo.phone,
       password,
     });
     newUser.password = password;
