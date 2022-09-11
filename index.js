@@ -12,6 +12,7 @@ const visitorRoutes = require("./src/routes/visitor.route");
 const contactRoutes = require("./src/routes/contact.route");
 const userRoutes = require("./src/routes/user.route");
 const videoRoutes = require("./src/routes/video.route");
+const feedbackRoutes = require("./src/routes/feedback.route");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -26,6 +27,7 @@ app.use("/api/visitors", visitorRoutes);
 app.use("/api/contacts", contactRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/videos", videoRoutes);
+app.use("/api/feedbacks", feedbackRoutes);
 
 mongoose
   .connect(dbUri)
