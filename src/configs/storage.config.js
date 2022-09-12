@@ -1,6 +1,6 @@
 const storageDir = process.env.STORAGE_DIR || "storage";
 
-exports.videoDir = ".storage/videos";
+exports.videoDir = `${storageDir}/videos`;
 
 exports.homeworkDir = ".storage/homeworks";
 

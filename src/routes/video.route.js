@@ -1,28 +1,59 @@
-const fs = require("fs");
 const router = require("express").Router();
-const { header } = require("express-validator");
+const { header, query } = require("express-validator");
 
-const {
-  index,
-  create,
-  stream,
-  show,
-} = require("../controllers/video.controller");
+const { index, stream, show } = require("../controllers/video.controller");
 const auth = require("../middlewares/auth.middleware");
 const validate = require("../middlewares/validate.middleware");
 
 router.get("/", auth, index);
 
 router.get(
-  "/:categoryID/:id/stream",
-  [header("range").notEmpty()],
-  validate,
+  "/:fileID/stream",
+  [header("range").notEmpty(), query("code").notEmpty()],
   auth,
+  validate,
   stream
 );
 
-router.get("/:categoryID/:id", auth, show);
+router.get("/:fileID", auth, show);
 
-router.post("/", create);
+router.post("/", async (_req, res) => {
+  const Video = require("../models/video.model");
+  await Video.create([
+    {
+      title: "آماده سازی",
+      order: 1,
+      files: [
+        {
+          title: "ویدیو اول",
+          path: "1.mp4",
+          order: 1,
+        },
+        {
+          title: "ویدیو دوم",
+          path: "1.mp4",
+          order: 2,
+        },
+      ],
+    },
+    {
+      title: "حروف الفبا",
+      order: 2,
+      files: [
+        {
+          title: "ویدیو اول",
+          path: "1.mp4",
+          order: 1,
+        },
+        {
+          title: "ویدیو دوم",
+          path: "1.mp4",
+          order: 2,
+        },
+      ],
+    },
+  ]);
+  res.end();
+});
 
 module.exports = router;

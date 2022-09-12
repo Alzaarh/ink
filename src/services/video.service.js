@@ -1,72 +1,67 @@
 const fs = require("fs");
 
-// third party modules
 const encryptor = require("simple-encryptor")(
   require("../configs/auth.config").encryptionKey
 );
 
-const VideoCategory = require("../models/videoCategory.model");
+const Video = require("../models/video.model");
 const { videoDir } = require("../configs/storage.config");
 
 exports.getAll = async () => {
-  // fetch all video categories sorted by order
-  const videoCategories = await VideoCategory.find({})
+  // fetch all videos sorted by order field (asc)
+  const videos = await Video.find()
     .sort({
       order: "asc",
-      "videos.order": "asc",
+      "files.order": "asc",
     })
     .lean();
-  // encrypt current timestamp and add it to videos
-  return videoCategories.map((videoCategory) => {
-    return videoCategory.videos.map((video) => {
-      video.code = encryptor.encrypt(Date.now());
-      return videoCategory;
-    });
-  });
+
+  return videos;
 };
 
-exports.stream = async (categoryID, videoID, range) => {
-  const category = await VideoCategory.findById(categoryID);
-  if (category) {
-    const video = category.videos.find(
-      (video) => video._id.toString() === videoID
-    );
-    if (video) {
-      const videoSize = fs.statSync(`${videoDir}/${video.path}`).size;
+exports.stream = async (fileID, range, code) => {
+  // fetch the file using fileID
+  const video = await Video.findOne({ "files._id": fileID });
+
+  if (video) {
+    // check the timestamp
+    const timestamp = encryptor.decrypt(code);
+    if (Date.now() - timestamp < 1000 * 60 * 60 * 2) {
+      // read file chunk
+      const file = video.files.find((file) => file._id.toString() === fileID);
+      const videoSize = fs.statSync(`${videoDir}/${file.path}`).size;
       const CHUNK_SIZE = 10 ** 6; // 1MB
       const start = Number(range.replace(/\D/g, ""));
       const end = Math.min(start + CHUNK_SIZE, videoSize - 1);
-      return { videoSize, start, end, videoPath: `${videoDir}/${video.path}` };
+      return { videoSize, start, end, videoPath: `${videoDir}/${file.path}` };
     }
   }
 };
 
-exports.getOne = async (categoryID, videoID) => {
-  const category = await VideoCategory.findById(categoryID);
-  if (category) {
-    const video = category.videos.find(
-      (video) => video._id.toString() === videoID
+exports.getOne = async (fileID) => {
+  // fetch the video using fileID
+  const video = await Video.findOne({ "files._id": fileID }).lean();
+
+  if (video) {
+    // extract the correct file
+    const file = video.files.find((file) => file._id.toString() === fileID);
+
+    // find the next file
+    let nextFile = video.files.find(
+      (nextFile) => nextFile.order === file.order + 1
     );
-    if (video) {
-      const data = { ...video._doc };
-      let nextVideo = category.videos.find(
-        (nextVideo) => nextVideo.order === video.order + 1
-      );
+    if (!nextFile) {
+      const nextVideo = await Video.findOne({ order: video.order + 1 });
       if (nextVideo) {
-        data.nextID = `${category._id}/${nextVideo._id}`;
-      } else {
-        const nextCategory = await VideoCategory.findOne({
-          order: category.order + 1,
-        });
-        if (nextCategory) {
-          nextVideo = nextCategory.videos.find((video) => video.order === 1);
-          if (nextVideo) {
-            data.nextID = `${nextCategory._id}/${nextVideo._id}`;
-          }
-        }
+        nextFile = nextVideo.files[0];
       }
-      return data;
     }
+    file.nextID = nextFile ? nextFile._id : null;
+
+    // encrypt current timestamp and add it to file
+    file.code = encryptor.encrypt(Date.now());
+
+    return file;
   }
 };
 

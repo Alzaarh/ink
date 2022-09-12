@@ -18,7 +18,9 @@ const verify = (token) => {
 
 const auth = async (req, res, next) => {
   try {
-    const decoded = await verify(req.get("Authorization").split("Bearer ")[1]);
+    const token =
+      req.query["accessToken"] || req.get("Authorization").split("Bearer ")[1];
+    const decoded = await verify(token);
     const user = await User.findOne({ email: decoded.email });
     if (!user) {
       res.status(401).json();

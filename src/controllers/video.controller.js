@@ -1,20 +1,25 @@
 const fs = require("fs");
-
+const asyncHandler = require("express-async-handler");
 const { getAll, create, getOne, stream } = require("../services/video.service");
 
 exports.index = async (_req, res) => {
-  res.json({ data: await getAll() });
+  const data = await getAll();
+
+  res.json({ data });
 };
 
-exports.stream = async (req, res) => {
+exports.stream = asyncHandler(async (req, res) => {
   const info = await stream(
-    req.params.categoryID,
-    req.params.id,
-    req.get("range")
+    req.params.fileID,
+    req.get("range"),
+    req.query.code
   );
+
   if (!info) {
-    return res.status(404).json({});
+    return res.status(404).end();
   }
+
+  // send correct response
   const contentLength = info.end - info.start + 1;
   const headers = {
     "Content-Range": `bytes ${info.start}-${info.end}/${info.videoSize}`,
@@ -28,15 +33,16 @@ exports.stream = async (req, res) => {
     end: info.end,
   });
   videoStream.pipe(res);
-};
+});
 
-exports.show = async (req, res) => {
-  const video = await getOne(req.params.categoryID, req.params.id);
+exports.show = asyncHandler(async (req, res) => {
+  const video = await getOne(req.params.fileID);
+
   if (!video) {
-    return res.status(404).json({});
+    return res.status(404).end();
   }
   res.json({ data: video });
-};
+});
 
 exports.create = async (req, res) => {
   await create(req.body);
