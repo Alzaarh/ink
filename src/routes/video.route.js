@@ -1,7 +1,12 @@
 const router = require("express").Router();
 const { header, query } = require("express-validator");
 
-const { index, stream, show } = require("../controllers/video.controller");
+const {
+  index,
+  stream,
+  show,
+  seen,
+} = require("../controllers/video.controller");
 const auth = require("../middlewares/auth.middleware");
 const validate = require("../middlewares/validate.middleware");
 
@@ -17,6 +22,9 @@ router.get(
 
 router.get("/:fileID", auth, show);
 
+router.patch("/:fileID/seen", auth, seen);
+
+// TODO: remove after launch
 router.post("/", async (_req, res) => {
   const Video = require("../models/video.model");
   await Video.create([

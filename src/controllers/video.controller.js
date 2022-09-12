@@ -1,6 +1,11 @@
 const fs = require("fs");
 const asyncHandler = require("express-async-handler");
-const { getAll, create, getOne, stream } = require("../services/video.service");
+const {
+  getAll,
+  getOne,
+  stream,
+  updateSeenByUsers,
+} = require("../services/video.service");
 
 exports.index = async (_req, res) => {
   const data = await getAll();
@@ -44,7 +49,7 @@ exports.show = asyncHandler(async (req, res) => {
   res.json({ data: video });
 });
 
-exports.create = async (req, res) => {
-  await create(req.body);
-  res.status(201).json({});
+exports.seen = async (req, res) => {
+  await updateSeenByUsers(req.params.fileID, req.user._id);
+  res.end();
 };

@@ -1,5 +1,5 @@
 const fs = require("fs");
-
+const mongoose = require("mongoose");
 const encryptor = require("simple-encryptor")(
   require("../configs/auth.config").encryptionKey
 );
@@ -20,19 +20,18 @@ exports.getAll = async () => {
 };
 
 exports.stream = async (fileID, range, code) => {
-  // fetch the file using fileID
   const video = await Video.findOne({ "files._id": fileID });
 
   if (video) {
-    // check the timestamp
     const timestamp = encryptor.decrypt(code);
-    if (Date.now() - timestamp < 1000 * 60 * 60 * 2) {
-      // read file chunk
+
+    if (Date.now() - timestamp > 1000 * 60 * 60 * 2) {
       const file = video.files.find((file) => file._id.toString() === fileID);
       const videoSize = fs.statSync(`${videoDir}/${file.path}`).size;
       const CHUNK_SIZE = 10 ** 6; // 1MB
       const start = Number(range.replace(/\D/g, ""));
       const end = Math.min(start + CHUNK_SIZE, videoSize - 1);
+
       return { videoSize, start, end, videoPath: `${videoDir}/${file.path}` };
     }
   }
@@ -65,6 +64,17 @@ exports.getOne = async (fileID) => {
   }
 };
 
-exports.create = async (data) => {
-  await VideoCategory.create(data);
+exports.updateSeenByUsers = async (fileID, userID) => {
+  const video = await Video.findOne({ "files._id": fileID });
+
+  if (video) {
+    const file = video.files.find((file) => file._id.toString() === fileID);
+
+    const alreadySeen = file.seenByUsers.find((id) => id.toString() === userID);
+    if (!alreadyseen) {
+      file.seenByUsers.push(new mongoose.Types.ObjectId(userID));
+      await file.save();
+    }
+    return true;
+  }
 };
