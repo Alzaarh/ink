@@ -14,7 +14,7 @@ router.get("/", auth, index);
 
 router.get(
   "/:fileID/stream",
-  [header("range").notEmpty(), query("code").notEmpty()],
+  [header("range").notEmpty()],
   auth,
   validate,
   stream
