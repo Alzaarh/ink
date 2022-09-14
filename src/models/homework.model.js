@@ -4,6 +4,7 @@ const fileSchema = new mongoose.Schema({
   title: String,
   path: String,
   order: Number,
+  printables: [mongoose.Schema.Types.ObjectId],
 });
 
 const homeworkSchema = new mongoose.Schema({

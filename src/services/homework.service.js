@@ -1,8 +1,6 @@
 const fs = require("fs");
-const encryptor = require("simple-encryptor")(
-  require("../configs/auth.config").encryptionKey
-);
 const Homework = require("../models/homework.model");
+const Printable = require("../models/printable.model");
 const { homeworkDir } = require("../configs/storage.config");
 
 exports.getAll = async () => {
@@ -20,7 +18,22 @@ exports.getOne = async (fileID) => {
   if (homework) {
     const file = homework.files.find((file) => file._id.toString() === fileID);
 
-    // file.code = encryptor.encrypt(Date.now());
+    const printables = await Printable.find();
+
+    fileIDs = file.printables;
+    file.printables = [];
+
+    for (let i = 0; i < fileIDs.length; i++) {
+      for (let j = 0; j < printables.length; j++) {
+        const foundFile = printables[j].files.find(
+          (file) => file._id.toString() === fileIDs[i].toString()
+        );
+
+        if (foundFile) {
+          file.printables.push(foundFile);
+        }
+      }
+    }
 
     return file;
   }

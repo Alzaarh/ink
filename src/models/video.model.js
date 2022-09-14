@@ -5,6 +5,8 @@ const fileSchema = new mongoose.Schema({
   path: String,
   order: Number,
   seenByUsers: [mongoose.ObjectId],
+  printables: [mongoose.Schema.Types.ObjectId],
+  homeworks: [mongoose.Schema.Types.ObjectId],
 });
 
 const videoSchema = new mongoose.Schema({

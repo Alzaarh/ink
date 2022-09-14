@@ -1,10 +1,8 @@
 const fs = require("fs");
 const mongoose = require("mongoose");
-const encryptor = require("simple-encryptor")(
-  require("../configs/auth.config").encryptionKey
-);
-
 const Video = require("../models/video.model");
+const Printable = require("../models/printable.model");
+const Homework = require("../models/homework.model");
 const { videoDir } = require("../configs/storage.config");
 
 exports.getAll = async () => {
@@ -57,8 +55,39 @@ exports.getOne = async (fileID) => {
     }
     file.nextID = nextFile ? nextFile._id : null;
 
-    // encrypt current timestamp and add it to file
-    // file.code = encryptor.encrypt(Date.now());
+    const printables = await Printable.find();
+
+    fileIDs = file.printables;
+    file.printables = [];
+
+    for (let i = 0; i < fileIDs.length; i++) {
+      for (let j = 0; j < printables.length; j++) {
+        const foundFile = printables[j].files.find(
+          (file) => file._id.toString() === fileIDs[i].toString()
+        );
+
+        if (foundFile) {
+          file.printables.push(foundFile);
+        }
+      }
+    }
+
+    const homeworks = await Homework.find();
+
+    fileIDs = file.homeworks;
+    file.homeworks = [];
+
+    for (let i = 0; i < fileIDs.length; i++) {
+      for (let j = 0; j < homeworks.length; j++) {
+        const foundFile = homeworks[j].files.find(
+          (file) => file._id.toString() === fileIDs[i].toString()
+        );
+
+        if (foundFile) {
+          file.homeworks.push(foundFile);
+        }
+      }
+    }
 
     return file;
   }
