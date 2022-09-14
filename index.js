@@ -13,6 +13,7 @@ const videoRoutes = require("./src/routes/video.route");
 const feedbackRoutes = require("./src/routes/feedback.route");
 const homeworkRoutes = require("./src/routes/homework.route");
 const printableRoutes = require("./src/routes/printable.route");
+const feedbackSessionRoutes = require("./src/routes/feedbackSession.route");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -30,6 +31,7 @@ app.use("/api/videos", videoRoutes);
 app.use("/api/feedbacks", feedbackRoutes);
 app.use("/api/homeworks", homeworkRoutes);
 app.use("/api/printables", printableRoutes);
+app.use("/api/feedbacksessions", feedbackSessionRoutes);
 
 // default error handler
 app.use((err, req, res, next) => {
